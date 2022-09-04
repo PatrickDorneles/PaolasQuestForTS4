@@ -1,47 +1,58 @@
 class_name PlayerStatus extends Node
 
-const PlayerMovementStates = preload('./PlayerMovementStates.gd')
+const PlayerStates = preload('./PlayerStates.gd').VALUES
 
-enum PlayerStates {
-	DEAD = 0,
-	ALIVE = 1
-}
+onready var player: Player = get_parent()
+onready var hit_timer: Timer = $HitTimer
 
 export var max_health_points: int
-export var speed: int
+export var speed_ratio: float
+export var speed_ratio_on_air: float
 export var max_speed: int
 export var jump_speed: int
-export(PlayerStates) var player_state = PlayerStates.ALIVE
+export(PlayerStates) var state = PlayerStates.IDLE
+export var alive: bool = true
 
-var movement_state = 0
 var jumping: bool = false
 var health_points: int
 
-signal hit_taken(actual_health)
-signal state_changed(new_state)
-signal movement_state_changed(new_state)
+signal health_updated(health_points)
+signal state_changed(new_state, old_state)
 
-func _init():
-	health_points = self.max_health_points
+func _ready():
+	health_points = max_health_points
 
-func take_hit(damage_amount: int):
-	health_points -= damage_amount
+func update_health(value: int):
+	health_points = clamp(health_points+value, 0, max_health_points)
 	
-	if(health_points > 0):
-		emit_signal("hit_taken", health_points)
+	emit_signal("health_updated", health_points)
 	
 	if(health_points <= 0):
-		player_state = PlayerStates.DEAD
-		emit_signal("state_changed", player_state)
+		die()
+		return
+	
+	# When beeing hit
+	if(health_points > 0 and value < 0):
+		set_state(PlayerStates.TAKING_DAMAGE)
+		hit_timer.start()
+		
+		get_tree().paused = true
+		player.forgiving_frame_timer.start()
 
-func set_movement_state(new_state: int):
-	movement_state = new_state
-	emit_signal("movement_state_changed", movement_state)
+func set_state(new_state: int):
+	var old_state = state
+	state = new_state
+	emit_signal("state_changed", state, old_state)
 
-func is_movement_state(state: int):
-	return movement_state == state
+func is_state(verification_state: int):
+	return state == verification_state
 
-func connect_to_status(node):
-	connect("hit_taken", node, "on_player_hit_taken")
-	connect("state_changed", node, "on_player_state_changed")
-	connect("movement_state_changed", node, "on_player_movement_state_changed")
+func die():
+	alive = false
+	if $DeathTimer.time_left == 0: $DeathTimer.start()
+
+func on_HitTimer_timeout():
+	set_state(PlayerStates.IDLE)
+
+func _on_DeathTimer_timeout():
+	Gamestate.lost_try()

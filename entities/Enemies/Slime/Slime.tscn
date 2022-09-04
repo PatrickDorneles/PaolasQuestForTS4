@@ -1,0 +1,83 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://entities/Enemies/Enemy.tscn" type="PackedScene" id=1]
+[ext_resource path="res://entities/Enemies/Slime/Slime.gd" type="Script" id=2]
+[ext_resource path="res://assets/Sprites/walking.slime.png" type="Texture" id=3]
+
+[sub_resource type="RectangleShape2D" id=8]
+extents = Vector2( 4, 4 )
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 3 )
+region = Rect2( 0, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 3 )
+region = Rect2( 32, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 3 )
+region = Rect2( 64, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 3 )
+region = Rect2( 96, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 3 )
+region = Rect2( 128, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 3 )
+region = Rect2( 160, 0, 32, 32 )
+
+[sub_resource type="SpriteFrames" id=7]
+animations = [ {
+"frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ) ],
+"loop": true,
+"name": "moving",
+"speed": 10.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 6, 3.5 )
+
+[node name="Slime" instance=ExtResource( 1 )]
+collision_layer = 2
+collision_mask = 4
+script = ExtResource( 2 )
+hit_damage = 1
+hit_knockback = 400
+speed = 50
+
+[node name="Collision" parent="." index="0"]
+position = Vector2( 0, 2 )
+shape = SubResource( 8 )
+
+[node name="AnimatedSprite" parent="." index="1"]
+scale = Vector2( 0.75, 0.75 )
+frames = SubResource( 7 )
+animation = "moving"
+frame = 2
+speed_scale = 1.5
+playing = true
+
+[node name="HitArea" type="Area2D" parent="." index="3"]
+
+[node name="HitCollision" type="CollisionShape2D" parent="HitArea" index="0"]
+position = Vector2( 0, 2.5 )
+shape = SubResource( 10 )
+
+[node name="SeeFloor" type="RayCast2D" parent="." index="4"]
+visible = false
+enabled = true
+cast_to = Vector2( -10, 10 )
+collision_mask = 4
+
+[node name="SeeWall" type="RayCast2D" parent="." index="5"]
+visible = false
+enabled = true
+cast_to = Vector2( -10, 0 )
+collision_mask = 4
+
+[connection signal="body_entered" from="HitArea" to="." method="_on_enter_hit_area"]
