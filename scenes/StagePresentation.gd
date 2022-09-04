@@ -8,7 +8,7 @@ func _ready():
 	try_label.text = try_label.text % Gamestate.tries
 	
 
-func _process(delta):
+func _process(_delta):
 	if(Input.is_action_just_pressed("ui_accept")):
 		go_to_stage()
 

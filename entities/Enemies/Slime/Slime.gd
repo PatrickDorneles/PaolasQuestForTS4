@@ -7,7 +7,7 @@ export var speed:int
 func _ready():
 	motion.x = -speed
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if(not $SeeFloor.is_colliding()):
 		flip()
 	

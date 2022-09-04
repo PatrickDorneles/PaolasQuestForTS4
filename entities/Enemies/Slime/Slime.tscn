@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/Sprites/walking.slime.png" type="Texture" id=3]
 
 [sub_resource type="RectangleShape2D" id=8]
-extents = Vector2( 4, 4 )
+extents = Vector2( 5, 4.5 )
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 3 )
@@ -37,10 +37,15 @@ animations = [ {
 "loop": true,
 "name": "moving",
 "speed": 10.0
+}, {
+"frames": [  ],
+"loop": true,
+"name": "death",
+"speed": 5.0
 } ]
 
 [sub_resource type="RectangleShape2D" id=10]
-extents = Vector2( 6, 3.5 )
+extents = Vector2( 8.75, 5.34375 )
 
 [node name="Slime" instance=ExtResource( 1 )]
 collision_layer = 2
@@ -51,21 +56,20 @@ hit_knockback = 400
 speed = 50
 
 [node name="Collision" parent="." index="0"]
-position = Vector2( 0, 2 )
+position = Vector2( 0, 3.5 )
 shape = SubResource( 8 )
 
 [node name="AnimatedSprite" parent="." index="1"]
-scale = Vector2( 0.75, 0.75 )
 frames = SubResource( 7 )
-animation = "moving"
-frame = 2
+animation = "death"
 speed_scale = 1.5
 playing = true
 
 [node name="HitArea" type="Area2D" parent="." index="3"]
 
 [node name="HitCollision" type="CollisionShape2D" parent="HitArea" index="0"]
-position = Vector2( 0, 2.5 )
+position = Vector2( 1.78814e-07, 3.725 )
+scale = Vector2( 0.8, 0.8 )
 shape = SubResource( 10 )
 
 [node name="SeeFloor" type="RayCast2D" parent="." index="4"]

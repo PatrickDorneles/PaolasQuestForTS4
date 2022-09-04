@@ -4,15 +4,16 @@ var stagePresentation = "res://scenes/StagePresentation.tscn"
 var winScene = "res://scenes/WinScene.tscn"
 
 var stagesDictionary = {
-	0: "res://scenes/Stages/StageOne.tscn",
-	1: "res://scenes/Stages/StageTwo.tscn",
+	0: "res://scenes/Stages/Stage1.tscn",
+	1: "res://scenes/Stages/Stage2.tscn",
+	2: "res://scenes/Stages/Stage3.tscn",
 }
 
 var stage: int
 var tries: int = 3
 
-func set_stage(stage):
-	self.stage = stage
+func set_stage(new_stage):
+	self.stage = new_stage
 
 func stage_cleared():
 	stage += 1

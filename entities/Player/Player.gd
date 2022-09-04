@@ -18,6 +18,8 @@ func _physics_process(_delta: float):
 	
 	move_and_slide(controls.motion, Vector2.UP)
 
+# Actions
+
 func heal(amount: int):
 	status.update_health(+amount)
 
@@ -42,6 +44,8 @@ func throw_up(value: int):
 
 func throw_back(value: int):
 	controls.motion.x = value * controls.facing_direction * -1
+
+# Signals callbacks
 
 func _on_Visibility_screen_exited():
 	if status.health_points != 0:
