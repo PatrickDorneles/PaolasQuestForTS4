@@ -42,6 +42,16 @@ config/name="Paola's Quest For TS4"
 run/main_scene="res://scenes/MenuScene.tscn"
 config/icon="res://icon.png"
 
+[aseprite]
+
+import/preset/enable_custom_preset=true
+import/import_plugin/enable_automatic_importer=true
+wizard/history/keep_one_entry_per_source_file=true
+
+[aseprite_animation_importer]
+
+aseprite_executable_path="aseprite"
+
 [autoload]
 
 GravityUtils="*res://utils/GravityUtils.gd"
@@ -50,6 +60,10 @@ Gamestate="*res://utils/Gamestate.gd"
 [debug]
 
 gdscript/warnings/return_value_discarded=false
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/AsepriteWizard/plugin.cfg" )
 
 [input]
 

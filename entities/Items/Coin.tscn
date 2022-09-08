@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://assets/Sprites/idle.coin.png" type="Texture" id=1]
 [ext_resource path="res://entities/Items/Coin.gd" type="Script" id=2]
 [ext_resource path="res://entities/Items/PickableItem.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/SFX/coin.collected.wav" type="AudioStream" id=4]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 1 )
@@ -35,4 +36,9 @@ script = ExtResource( 2 )
 scale = Vector2( 0.8, 0.8 )
 frames = SubResource( 5 )
 animation = "idle_coin"
-frame = 1
+frame = 2
+
+[node name="CollectSFX" type="AudioStreamPlayer2D" parent="." index="2"]
+stream = ExtResource( 4 )
+volume_db = -20.0
+pitch_scale = 0.6

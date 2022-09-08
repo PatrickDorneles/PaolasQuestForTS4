@@ -2,6 +2,8 @@ class_name Player extends KinematicBody2D
 
 const PlayerStates = preload('./PlayerStates.gd').VALUES
 
+signal died()
+
 onready var controls = $PlayerControls
 onready var status = $PlayerStatus
 onready var inventory = $Inventory
@@ -11,10 +13,11 @@ onready var forgiving_frame_timer = $ForgivingFrameTimer
 
 func _physics_process(_delta: float):
 	if status.alive:
-		controls.apply_gravity()
 		controls.await_input()
 	else:
 		controls.motion = Vector2.ZERO
+	
+	controls.apply_gravity()
 	
 	move_and_slide(controls.motion, Vector2.UP)
 
@@ -24,7 +27,7 @@ func heal(amount: int):
 	status.update_health(+amount)
 
 func die():
-	status.player_state = PlayerStates.IDLE
+	emit_signal("died")
 
 func damage(amount: int, knockback: int = 0):
 	if hit_timer.time_left > 0: return
@@ -33,7 +36,6 @@ func damage(amount: int, knockback: int = 0):
 	
 	if not status.alive:
 		$AnimationPlayer.animate_death()
-		$PhisycalCollision.set_deferred("disabled", true)
 		return
 	
 	if(knockback > 0):
@@ -55,7 +57,7 @@ func _on_HitBoxArea_body_entered(body:Node) -> void:
 	if(body is Enemy 
 		and not status.is_state(PlayerStates.TAKING_DAMAGE)
 		and not status.is_state(PlayerStates.DEAD)):
-		body.queue_free()
+		body.die()
 		controls.jump()
 		
 		get_tree().paused = true

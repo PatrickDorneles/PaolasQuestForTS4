@@ -7,4 +7,3 @@ func _on_item_taken(entity):
 func _on_item_touched(body: Node):
 	if(body is Player):
 		_on_item_taken(body)
-		queue_free()

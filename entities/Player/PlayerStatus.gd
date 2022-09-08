@@ -4,10 +4,11 @@ const PlayerStates = preload('./PlayerStates.gd').VALUES
 
 onready var player: Player = get_parent()
 onready var hit_timer: Timer = $HitTimer
+onready var hurt_audio_player: AudioStreamPlayer = $"../AudioPlayers/Hurt"
 
 export var max_health_points: int
-export var speed_ratio: float
-export var speed_ratio_on_air: float
+export var acceleration: float
+export var acceleration_on_air: float
 export var max_speed: int
 export var jump_speed: int
 export(PlayerStates) var state = PlayerStates.IDLE
@@ -23,6 +24,8 @@ func _ready():
 	health_points = max_health_points
 
 func update_health(value: int):
+	if not alive: return
+	
 	health_points = clamp(health_points+value, 0, max_health_points)
 	
 	emit_signal("health_updated", health_points)
@@ -33,6 +36,7 @@ func update_health(value: int):
 	
 	# When beeing hit
 	if(health_points > 0 and value < 0):
+		hurt_audio_player.play()
 		set_state(PlayerStates.TAKING_DAMAGE)
 		hit_timer.start()
 		
@@ -49,10 +53,7 @@ func is_state(verification_state: int):
 
 func die():
 	alive = false
-	if $DeathTimer.time_left == 0: $DeathTimer.start()
+	player.die()
 
 func on_HitTimer_timeout():
 	set_state(PlayerStates.IDLE)
-
-func _on_DeathTimer_timeout():
-	Gamestate.lost_try()

@@ -6,6 +6,7 @@ const FacingDirection = preload('./FacingDirection.gd').VALUES
 onready var player: Player = get_parent()
 onready var status = get_node("../PlayerStatus")
 onready var animated_sprite: AnimatedSprite = get_node("../AnimatedSprite")
+onready var jump_audio_player: AudioStreamPlayer = $"../AudioPlayers/Jump"
 
 export(FacingDirection) var facing_direction = FacingDirection.RIGHT
 export(FacingDirection) var movement_direction = FacingDirection.NULL
@@ -33,11 +34,9 @@ func await_jump():
 	)
 	
 	if can_jump and Input.is_action_just_pressed("player_jump"):
-		
 		if(Input.is_action_pressed("player_look_down")):
 			jump_down()
 			return
-		
 		jump()
 
 func await_movement():
@@ -52,7 +51,6 @@ func await_movement():
 		animated_sprite.set_flip_h(true)
 		movement_direction = FacingDirection.LEFT
 		facing_direction = FacingDirection.LEFT
-		
 	elif(
 		Input.is_action_pressed("player_move_right")
 		 and !Input.is_action_pressed("player_move_left")
@@ -79,9 +77,9 @@ func apply_gravity():
 		and not status.is_state(PlayerStates.TAKING_DAMAGE)):
 			status.set_state(PlayerStates.FALLING)
 	
-	if player.is_on_ceiling() and status.is_state(PlayerStates.JUMPING):
+	if player.is_on_ceiling() and not player.is_on_floor():
 		status.set_state(PlayerStates.FALLING)
-		motion.y = 0
+		motion.y = 1
 		return
 	
 	if player.is_on_floor() and not status.is_state(PlayerStates.TAKING_DAMAGE):
@@ -105,21 +103,21 @@ func apply_gravity():
 # Utility Functions
 
 func get_x_movement_value(direction: int):
-	var speed_ratio = status.speed_ratio if player.is_on_floor() else status.speed_ratio_on_air
+	var acceleration = status.acceleration if player.is_on_floor() else status.acceleration_on_air
 	var max_speed = status.max_speed
 	
 	if direction == 1:
-		return min(lerp(motion.x, max_speed, speed_ratio), max_speed)
+		return min(lerp(motion.x, max_speed, acceleration), max_speed)
 	
 	if direction == -1:
-		return max(lerp(motion.x, -max_speed, speed_ratio), -max_speed)
+		return max(lerp(motion.x, -max_speed, acceleration), -max_speed)
 	
 	if direction == 0:
 		
 		var is_motion_x_positive = motion.x > 0
 		var is_motion_x_negative = motion.x < 0
 		
-		var value = clamp(lerp(motion.x, 0, speed_ratio), -max_speed, max_speed)
+		var value = clamp(lerp(motion.x, 0, acceleration), -max_speed, max_speed)
 		
 		if is_motion_x_negative and motion.x > -5:
 			return 0
@@ -134,18 +132,21 @@ func get_x_movement_value(direction: int):
 # Action Funtions
 
 func jump():
-	status.set_state(PlayerStates.JUMPING)
 	motion.y = -status.jump_speed
+	yield(get_tree().create_timer(0), "timeout")
+	status.set_state(PlayerStates.JUMPING)
+	jump_audio_player.play()
 
 func jump_down():
 	player.position.y += 1
 
-func throw_up(value: int):
+func throw_up(value: float):
 	motion.y = value * -1
 
-func throw_back(value: int, direction = 0):
+func throw_back(value: float, direction = 0):
 	motion.x = value * direction * -1
 
-func apply_knockback(value, direction = 0):
+func apply_knockback(value, _direction = 0):
 	throw_up(min(value/2, 200))
-	throw_back(value, direction)
+	yield(get_tree().create_timer(0.1), "timeout")
+	throw_back(value, facing_direction)

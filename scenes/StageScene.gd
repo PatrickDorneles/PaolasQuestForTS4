@@ -8,4 +8,10 @@ export var stage: int
 func _ready():
 	Gamestate.set_stage(stage)
 	background.visible = true
-	
+	player.connect("died", self, "player_died")
+
+func player_died():
+	print("here")
+	$DeathMusic.play()
+	yield($DeathMusic, "finished")
+	Gamestate.lost_try()

@@ -13,3 +13,6 @@ func _physics_process(delta):
 
 func apply_gravity():
 	motion = GravityUtils.apply_gravity(self, motion)
+
+func die():
+	pass

@@ -24,3 +24,13 @@ func flip():
 func _on_enter_hit_area(body):
 	if body is Player:
 		body.damage(hit_damage, hit_knockback)
+
+func die():
+	speed = 0
+	motion = Vector2.ZERO
+	$AnimatedSprite.play("death")
+	$DeathSFX.play()
+
+func _on_sprite_animation_finished() -> void:
+	if $AnimatedSprite.animation == "death":
+		queue_free()
